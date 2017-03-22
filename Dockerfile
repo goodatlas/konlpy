@@ -31,4 +31,7 @@ RUN make install
 
 RUN python3.6 -m pip install mecab-python3
 
-WORKDIR /konlpy
+WORKDIR /
+
+RUN rm -rf /konlpy
+RUN rm requirements-py3.txt
