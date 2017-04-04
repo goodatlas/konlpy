@@ -1,0 +1,14 @@
+machine:
+  python:
+    version: 3.6.0
+
+dependencies:
+  override:
+    - pip install -r requirements-py3.txt --use-mirrors
+    - pip install coveralls
+    - pip install pytest-cov
+    - python setup.py -q install
+
+test:
+  override:
+    - coverage run --source=konlpy -m py.test -k 'not (komoran or mecab)'
