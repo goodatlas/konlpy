@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   override:
-    - pip install -r requirements-py3.txt --use-mirrors
+    - pip install -r requirements-py3.txt
     - pip install coveralls
     - pip install pytest-cov
     - python setup.py -q install
