@@ -19,7 +19,7 @@ def requirements():
         _genver(3, range(5)): _openreq('requirements-py3.txt')
     }
 
-setup(name='atlasguide-konlpy',
+setup(name='goodatlas-konlpy',
     version=__version__,
     description='Python package for Korean natural language processing.',
     long_description="""\
