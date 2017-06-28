@@ -4,7 +4,7 @@
 import os
 import sys
 from setuptools import find_packages, setup
-from konlpy import __version__
+from goodatlas.konlpy import __version__
 
 
 def requirements():
