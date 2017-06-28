@@ -8,22 +8,20 @@ import os
 import pprint as pp
 import sys
 
-
 installpath = os.path.dirname(os.path.realpath(__file__))
 replace_set = [
-    ('·', '/'),     # \xb7
-    ('․', '/'),     # \u2024
-    ('ㆍ', '/'),    # \u318d (hangul letter araea)
-    ('･', '/'),     # \uff65 (katakana)
-    ('～', '~'),    # \uff5e
-    ('❑', '-'),     # \u2751
-    ('‘', "'"),     # \u2018
-    ('’', "'"),     # \u2019
-    ('“', '"'),     # \u201c
-    ('”', '"'),     # \u201d
-    ('「', '<'),    # \u300c
-    ('」', '>')]    # \u300d
-
+    ('·', '/'),  # \xb7
+    ('․', '/'),  # \u2024
+    ('ㆍ', '/'),  # \u318d (hangul letter araea)
+    ('･', '/'),  # \uff65 (katakana)
+    ('～', '~'),  # \uff5e
+    ('❑', '-'),  # \u2751
+    ('‘', "'"),  # \u2018
+    ('’', "'"),  # \u2019
+    ('“', '"'),  # \u201c
+    ('”', '"'),  # \u201d
+    ('「', '<'),  # \u300c
+    ('」', '>')]  # \u300d
 
 if sys.version_info[0] < 3:
     class UnicodePrinter(pp.PrettyPrinter):
@@ -80,6 +78,7 @@ def concordance(phrase, text, show=False):
 if sys.version_info[0] < 3:
     from . import csvutils
 
+
     def csvread(f, encoding='utf-8'):
         """Reads a csv file.
 
@@ -94,6 +93,7 @@ if sys.version_info[0] < 3:
         """
         reader = csvutils.UnicodeReader(f)
         return [row for row in reader]
+
 
     def csvwrite(data, f):
         """Writes a csv file.
@@ -117,6 +117,7 @@ def partition(list_, indices):
     :param indices: Indices to partition the target list.
     """
     return [list_[i:j] for i, j in zip([0] + indices, indices + [None])]
+
 
 if sys.version_info[0] < 3:
     def pprint(obj):
