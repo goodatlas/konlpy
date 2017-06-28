@@ -15,6 +15,6 @@ test:
 
 deployment:
   publish:
-    branch: kcrong-automate-release
+    branch: master
     commands:
       - make publish
