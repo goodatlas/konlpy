@@ -11,6 +11,49 @@
 #
 # TODO: use flake8 and/or pylint
 
+
+# Exit with error if GEMFURY_PYPI is not set when publishing python
+ifeq ($(MAKECMDGOALS), $(filter $(MAKECMDGOALS), publish, install-dev))
+ifndef GEMFURY_PYPI
+$(error GEMFURY_PYPI is not set)
+endif
+endif
+
+# When publishing tags
+ifeq ($(MAKECMDGOALS), $(filter $(MAKECMDGOALS), publish publish-version-tag))
+# Ask for github credentials
+ifndef GITHUB_CREDENTIALS
+GITHUB_CREDENTIALS := $(shell read -p "Enter github credentials(USERNAME:PASSWORD): ";echo $$REPLY)
+endif
+
+# Do a release check
+ifdef CI
+RELEASE_CHECK_FLAGS := "--skip-build-check"
+RELEASE_CHECK_ALLOW_ERR := 0 3
+else
+RELEASE_CHECK_ALLOW_ERR := 0
+endif
+
+RELEASE_CHECK := $(shell ./script/check-release \
+	$(GITHUB_CREDENTIALS) \
+	$(RELEASE_CHECK_FLAGS) \
+	1>&2 \
+	; echo "$$?")
+
+ifneq ($(RELEASE_CHECK), $(filter $(RELEASE_CHECK), $(RELEASE_CHECK_ALLOW_ERR)))
+$(error release-check exit code: $(RELEASE_CHECK))
+endif
+endif
+
+# Check that VERSION si set when checking or bumping version
+ifeq ($(MAKECMDGOALS), $(filter $(MAKECMDGOALS), check-version bump-version))
+ifndef VERSION
+$(error VERSION is not set. ex "make $(filter $(MAKECMDGOALS),check-version bump-version) VERSION=1.2.3")
+endif
+endif
+
+
+
 check:
 	check-manifest
 	pyroma dist/konlpy-*tar.gz
