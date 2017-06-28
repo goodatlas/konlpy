@@ -1,6 +1,7 @@
+from .version import __version__
 __title__ = 'KoNLPy'
-__version__ = '0.4.4'
 __author__ = 'Lucy Park'
+__editor__ = 'Kcrong'
 __license__ = 'GPL v3'
 __copyright__ = 'Copyright 2015 Lucy Park'
 
