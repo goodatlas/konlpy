@@ -71,13 +71,15 @@ class Hannanum():
         result = self.jhi.morphAnalyzer(phrase)
         return parse(result)
 
-    def pos(self, phrase, ntags=9, flatten=True):
+    def pos(self, phrase, ntags=9, flatten=True, space=False):
         """POS tagger.
 
         This tagger is HMM based, and calculates the probability of tags.
 
         :param ntags: The number of tags. It can be either 9 or 22.
-        :param flatten: If False, preserves eojeols."""
+        :param flatten: If False, preserves eojeols.
+        :param space: If True, return tokens with space character
+        """
 
         if ntags == 9:
             result = self.jhi.simplePos09(phrase)
@@ -85,6 +87,10 @@ class Hannanum():
             result = self.jhi.simplePos22(phrase)
         else:
             raise Exception('ntags in [9, 22]')
+
+        if space is True:
+            return self.__spacing(sentence=phrase, pos_result=parse(result, flatten=flatten))
+
         return parse(result, flatten=flatten)
 
     def nouns(self, phrase):
@@ -97,6 +103,34 @@ class Hannanum():
         """Parse phrase to morphemes."""
 
         return [s for s, t in self.pos(phrase)]
+
+    def __spacing(self, sentence: str, pos_result: list):
+
+        """ __spacing(sentence, pos_result)
+        insert space_tuple (" ", "Space") into pos_result to preserver space character
+
+        :param sentence: origin sentence (before pos analysis)
+        :param pos_result: pos analysis result with self.pos(***)
+        """
+
+        sentence_index = 0
+        tuple_index = 0
+
+        for text, pos in pos_result:
+            sentence_index += len(text)
+            tuple_index += 1
+            if len(sentence) > sentence_index and sentence[sentence_index] == " ":
+                pos_result.insert(tuple_index, (" ", "Space"))
+        return pos_result
+
+    def __init__(self, dicpath='/usr/local/lib/mecab/dic/mecab-ko-dic'):
+        try:
+            self.tagger = Tagger('-d %s' % dicpath)
+            self.tagset = utils.read_json('%s/data/tagset/mecab.json' % utils.installpath)
+        except RuntimeError:
+            raise Exception(
+                'Invalid MeCab dictionary path: "%s"\nInput the correct path when initiializing class: "Mecab(\'/some/dic/path\')"' % dicpath)
+
 
     def __init__(self, jvmpath=None):
         if not jpype.isJVMStarted():

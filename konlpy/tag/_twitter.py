@@ -34,7 +34,7 @@ class Twitter():
     :param jvmpath: The path of the JVM passed to :py:func:`.init_jvm`.
     """
 
-    def pos(self, phrase, norm=False, stem=False):
+    def pos(self, phrase, norm=False, stem=False, space=False):
         """POS tagger.
         In contrast to other classes in this subpackage,
         this POS tagger doesn't have a `flatten` option,
@@ -43,13 +43,20 @@ class Twitter():
 
         :param norm: If True, normalize tokens.
         :param stem: If True, stem tokens.
+        :param space: If True, return tokens with space character
         """
 
         tokens = self.jki.tokenize(
-                    phrase,
-                    jpype.java.lang.Boolean(norm),
-                    jpype.java.lang.Boolean(stem)).toArray()
-        return [tuple(t.rsplit('/', 1)) for t in tokens]
+            phrase,
+            jpype.java.lang.Boolean(norm),
+            jpype.java.lang.Boolean(stem)).toArray()
+
+        pos_result = [tuple(t.rsplit('/', 1)) for t in tokens]
+
+        if space is True:
+            return self.__spacing(sentence=phrase, pos_result=pos_result)
+
+        return pos_result
 
     def nouns(self, phrase):
         """Noun extractor."""
@@ -66,10 +73,29 @@ class Twitter():
         """Phrase extractor."""
 
         return [p for p in self.jki.phrases(phrase).toArray()]
-    
+
     def normalize(self, phrase):
         text = self.jki.normalize(phrase)
         return text
+
+    def __spacing(self, sentence: str, pos_result: list):
+
+        """ __spacing(sentence, pos_result)
+        insert space_tuple (" ", "Space") into pos_result to preserver space character
+
+        :param sentence: origin sentence (before pos analysis)
+        :param pos_result: pos analysis result with self.pos(***)
+        """
+
+        sentence_index = 0
+        tuple_index = 0
+
+        for text, pos in pos_result:
+            sentence_index += len(text)
+            tuple_index += 1
+            if len(sentence) > sentence_index and sentence[sentence_index] == " ":
+                pos_result.insert(tuple_index, (" ", "Space"))
+        return pos_result
 
     def __init__(self, jvmpath=None):
         if not jpype.isJVMStarted():

@@ -9,19 +9,17 @@ except ImportError:
     pass
 from .. import utils
 
-
 __all__ = ['Mecab']
 
-
-attrs = ['tags',        # 품사 태그
-         'semantic',    # 의미 부류
+attrs = ['tags',  # 품사 태그
+         'semantic',  # 의미 부류
          'has_jongsung',  # 종성 유무
-         'read',        # 읽기
-         'type',        # 타입
-         'first_pos',   # 첫번째 품사
-         'last_pos',    # 마지막 품사
-         'original',    # 원형
-         'indexed']     # 인덱스 표현
+         'read',  # 읽기
+         'type',  # 타입
+         'first_pos',  # 첫번째 품사
+         'last_pos',  # 마지막 품사
+         'original',  # 원형
+         'indexed']  # 인덱스 표현
 
 
 def parse(result, allattrs=False):
@@ -64,27 +62,33 @@ class Mecab():
     """
 
     # TODO: check whether flattened results equal non-flattened
-    def pos(self, phrase, flatten=True):
+    def pos(self, phrase, flatten=True, space=False):
         """POS tagger.
 
         :param flatten: If False, preserves eojeols.
+        :param space: If True, return tokens with space character
         """
 
         if sys.version_info[0] < 3:
             phrase = phrase.encode('utf-8')
             if flatten:
                 result = self.tagger.parse(phrase).decode('utf-8')
-                return parse(result)
+                return_result = parse(result)
             else:
-                return [parse(self.tagger.parse(eojeol).decode('utf-8'))
-                        for eojeol in phrase.split()]
+                return_result = [parse(self.tagger.parse(eojeol).decode('utf-8'))
+                                 for eojeol in phrase.split()]
         else:
             if flatten:
                 result = self.tagger.parse(phrase)
-                return parse(result)
+                return_result = parse(result)
             else:
-                return [parse(self.tagger.parse(eojeol).decode('utf-8'))
-                        for eojeol in phrase.split()]
+                return_result = [parse(self.tagger.parse(eojeol).decode('utf-8'))
+                                 for eojeol in phrase.split()]
+
+        if space is True:
+            return self.__spacing(sentence=phrase, pos_result=return_result)
+
+        return return_result
 
     def morphs(self, phrase):
         """Parse phrase to morphemes."""
@@ -97,9 +101,29 @@ class Mecab():
         tagged = self.pos(phrase)
         return [s for s, t in tagged if t.startswith('N')]
 
+    def __spacing(self, sentence: str, pos_result: list):
+
+        """ __spacing(sentence, pos_result)
+        insert space_tuple (" ", "Space") into pos_result to preserver space character
+
+        :param sentence: origin sentence (before pos analysis)
+        :param pos_result: pos analysis result with self.pos(***)
+        """
+
+        sentence_index = 0
+        tuple_index = 0
+
+        for text, pos in pos_result:
+            sentence_index += len(text)
+            tuple_index += 1
+            if len(sentence) > sentence_index and sentence[sentence_index] == " ":
+                pos_result.insert(tuple_index, (" ", "Space"))
+        return pos_result
+
     def __init__(self, dicpath='/usr/local/lib/mecab/dic/mecab-ko-dic'):
         try:
             self.tagger = Tagger('-d %s' % dicpath)
             self.tagset = utils.read_json('%s/data/tagset/mecab.json' % utils.installpath)
         except RuntimeError:
-            raise Exception('Invalid MeCab dictionary path: "%s"\nInput the correct path when initiializing class: "Mecab(\'/some/dic/path\')"' % dicpath)
+            raise Exception(
+                'Invalid MeCab dictionary path: "%s"\nInput the correct path when initiializing class: "Mecab(\'/some/dic/path\')"' % dicpath)

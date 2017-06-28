@@ -8,7 +8,6 @@ import jpype
 from .. import jvm
 from .. import utils
 
-
 __all__ = ['Kkma']
 
 
@@ -46,7 +45,7 @@ class Kkma():
         if not nouns: return []
         return [nouns.get(i).getString() for i in range(nouns.size())]
 
-    def pos(self, phrase, flatten=True):
+    def pos(self, phrase, flatten=True, space=False):
         """POS tagger.
 
         :param flatten: If False, preserves eojeols."""
@@ -66,7 +65,10 @@ class Kkma():
                         morphemes.append((morpheme.getString(), morpheme.getTag()))
                 else:
                     morphemes.append([(eojeol.get(k).getString(), eojeol.get(k).getTag())
-                                     for k in range(eojeol.size())])
+                                      for k in range(eojeol.size())])
+
+        if space is True:
+            return self.__spacing(sentence=phrase, pos_result=morphemes)
 
         return morphemes
 
@@ -81,6 +83,25 @@ class Kkma():
         sentences = self.jki.morphAnalyzer(phrase)
         if not sentences: return []
         return [sentences.get(i).getSentence() for i in range(sentences.size())]
+
+    def __spacing(self, sentence: str, pos_result: list):
+
+        """ __spacing(sentence, pos_result)
+        insert space_tuple (" ", "Space") into pos_result to preserver space character
+
+        :param sentence: origin sentence (before pos analysis)
+        :param pos_result: pos analysis result with self.pos(***)
+        """
+
+        sentence_index = 0
+        tuple_index = 0
+
+        for text, pos in pos_result:
+            sentence_index += len(text)
+            tuple_index += 1
+            if len(sentence) > sentence_index and sentence[sentence_index] == " ":
+                pos_result.insert(tuple_index, (" ", "Space"))
+        return pos_result
 
     def __init__(self, jvmpath=None):
         if not jpype.isJVMStarted():
