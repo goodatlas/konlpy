@@ -9,7 +9,7 @@ import pytest
 
 @pytest.fixture
 def tkorean_instance():
-    from konlpy.tag import Twitter
+    from goodatlas.konlpy.tag import Twitter
     t = Twitter()
     return t
 

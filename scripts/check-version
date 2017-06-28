@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+#
+# setuptools is very picky with versioning. This scripts validates a version
+# validates the version and exits with code 1 if not valid
+#
+# Usage: check-version VERSION
+#
+
+import sys
+import setuptools
+import packaging
+
+version = sys.argv[1]
+try:
+  sanitized_version = str(packaging.version.Version(version))
+except packaging.version.InvalidVersion as err:
+  print("error: {}".format(err))
+  exit(1)
+
+if sanitized_version != version:
+    print("error: version is not valid. Suggested value ==> {}".format(sanitized_version))
+    exit(1)

@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+
+function usage() {
+    >&2 cat << EOM
+Check if the latest commit can be released.
+
+Exit codes:
+    0    release can be created
+    2    CI build did not succeed
+    3    git tag exists
+    4    error accessing Github API
+    127  jq command not available
+
+Usage:
+
+    $0 <username:password> [flags]
+
+Options:
+
+    username  Github username
+    password  Github password
+    flags     --skip-build-check
+
+EOM
+    exit 1
+}
+
+
+[ -n "$1" ] || usage
+CREDENTIALS="$1"
+COMMIT_SHA=$(git rev-parse HEAD)
+TAG=v$(awk -F "'" '/^__version__/{ print $2 }' $(dirname "${BASH_SOURCE[0]}")/../goodatlas/konlpy/version.py)
+API_URL="https://api.github.com/repos/goodatlas/konlpy"
+shift
+
+#
+# Parse flags
+#
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        --skip-build-check)
+            SKIP_BUILD_CHECK="true"
+            ;;
+        *)
+            # unknown option
+            ;;
+    esac
+    shift
+done
+
+#
+# Check build status
+#
+if [ -z "$SKIP_BUILD_CHECK" ]; then
+    if [ -z "$(command -v jq 2> /dev/null)" ]; then
+        >&2 echo "$0 requires https://stedolan.github.io/jq/"
+        >&2 echo "Please install it and make sure it is available on your \$PATH."
+        exit 127
+    fi
+
+    tmp_file=$(mktemp)
+    url="$API_URL/statuses/$COMMIT_SHA"
+    http_code=$(curl \
+        -u $CREDENTIALS \
+        -w "%{http_code}" \
+        -s \
+        -o $tmp_file \
+        $url)
+
+    if [[ "$http_code" != "200" ]]; then
+        >&2 echo "Error accessing Github URL ($url). Response:"
+        >&2 cat $tmp_file
+        rm -f $tmp_file
+        exit 4
+    fi
+
+    build_status=$(cat $tmp_file | jq -r '.[0].state')
+    rm -f $tmp_file
+
+    if [[ "$build_status" != "success" ]]; then
+        >&2 echo "Build status is $build_status, but it should be success."
+        exit 2
+    fi
+else
+    echo "Skipping build status check..."
+fi
+
+#
+# Check if tag exists already
+#
+tmp_file=$(mktemp)
+url=$API_URL/git/refs/tags/$TAG
+http_code=$(curl \
+    -u $CREDENTIALS \
+    -w "%{http_code}" \
+    -s \
+    -o $tmp_file \
+    $url)
+
+if [[ "$http_code" == "200" ]]; then
+    exit_code=3
+    >&2 echo "Git tag already exists: $TAG"
+elif [[ "$http_code" == "404" ]]; then
+    echo "Release $TAG can be created..."
+    exit_code=0
+else
+    exit_code=4
+    >&2 echo "Error accessing Github URL ($url). Response:"
+    >&2 cat $tmp_file
+fi
+
+rm -f $tmp_file
+exit $exit_code

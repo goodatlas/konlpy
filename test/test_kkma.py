@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def kkma_instance():
-    from konlpy.tag import Kkma
+    from goodatlas.konlpy.tag import Kkma
     k = Kkma()
     return k
 
