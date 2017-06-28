@@ -196,6 +196,7 @@ def read_json(filename, encoding='utf-8'):
 def spacing(sentence: str, pos_result: list):
     """ __spacing(sentence, pos_result)
     insert space_tuple (" ", "Space") into pos_result to preserver space character
+
     :param sentence: origin sentence (before pos analysis)
     :param pos_result: pos analysis result with self.pos(***)
     """

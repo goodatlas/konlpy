@@ -107,4 +107,5 @@ class Mecab():
             self.tagset = utils.read_json('%s/data/tagset/mecab.json' % utils.installpath)
         except RuntimeError:
             raise Exception(
-                'Invalid MeCab dictionary path: "%s"\nInput the correct path when initiializing class: "Mecab(\'/some/dic/path\')"' % dicpath)
+                'Invalid MeCab dictionary path: "%s"\n'
+                'Input the correct path when initiializing class: "Mecab(\'/some/dic/path\')"' % dicpath)
