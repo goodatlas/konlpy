@@ -71,13 +71,15 @@ class Hannanum():
         result = self.jhi.morphAnalyzer(phrase)
         return parse(result)
 
-    def pos(self, phrase, ntags=9, flatten=True):
+    def pos(self, phrase, ntags=9, flatten=True, space=False):
         """POS tagger.
 
         This tagger is HMM based, and calculates the probability of tags.
 
         :param ntags: The number of tags. It can be either 9 or 22.
-        :param flatten: If False, preserves eojeols."""
+        :param flatten: If False, preserves eojeols.
+        :param space: If True, return tokens with space character
+        """
 
         if ntags == 9:
             result = self.jhi.simplePos09(phrase)
@@ -85,6 +87,10 @@ class Hannanum():
             result = self.jhi.simplePos22(phrase)
         else:
             raise Exception('ntags in [9, 22]')
+
+        if space is True:
+            return utils.spacing(sentence=phrase, pos_result=parse(result, flatten=flatten))
+
         return parse(result, flatten=flatten)
 
     def nouns(self, phrase):
