@@ -86,7 +86,7 @@ class Mecab():
                                  for eojeol in phrase.split()]
 
         if space is True:
-            return self.__spacing(sentence=phrase, pos_result=return_result)
+            return utils.spacing(sentence=phrase, pos_result=return_result)
 
         return return_result
 
@@ -100,25 +100,6 @@ class Mecab():
 
         tagged = self.pos(phrase)
         return [s for s, t in tagged if t.startswith('N')]
-
-    def __spacing(self, sentence: str, pos_result: list):
-
-        """ __spacing(sentence, pos_result)
-        insert space_tuple (" ", "Space") into pos_result to preserver space character
-
-        :param sentence: origin sentence (before pos analysis)
-        :param pos_result: pos analysis result with self.pos(***)
-        """
-
-        sentence_index = 0
-        tuple_index = 0
-
-        for text, pos in pos_result:
-            sentence_index += len(text)
-            tuple_index += 1
-            if len(sentence) > sentence_index and sentence[sentence_index] == " ":
-                pos_result.insert(tuple_index, (" ", "Space"))
-        return pos_result
 
     def __init__(self, dicpath='/usr/local/lib/mecab/dic/mecab-ko-dic'):
         try:
