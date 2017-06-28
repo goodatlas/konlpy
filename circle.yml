@@ -1,6 +1,6 @@
 machine:
   python:
-    version: 3.6.0
+    version: 3.5.3
 
 dependencies:
   override:
@@ -12,3 +12,9 @@ dependencies:
 test:
   override:
     - coverage run --source=konlpy -m py.test -k 'not (komoran or mecab)'
+
+deployment:
+  publish:
+    branch: master
+    commands:
+      - make publish
