@@ -34,7 +34,7 @@ else
 RELEASE_CHECK_ALLOW_ERR := 0
 endif
 
-RELEASE_CHECK := $(shell ./script/check-release \
+RELEASE_CHECK := $(shell ./scripts/check-release \
 	$(GITHUB_CREDENTIALS) \
 	$(RELEASE_CHECK_FLAGS) \
 	1>&2 \
@@ -109,3 +109,40 @@ update_i18n:
 	cd docs\
 	    && sphinx-intl build\
 	    && make -e SPHINXOPTS="-D language='ko'" html
+
+
+################################################################################
+# For automatic deployment
+
+PY_PKG := "$(shell python setup.py --name)-$(shell python setup.py --version)"
+
+ifeq ($(RELEASE_CHECK), 0)
+publish: publish-version-tag
+	@python setup.py sdist
+	@./scripts/gemfury $(PY_PKG) $(GEMFURY_PYPI)
+
+publish-version-tag:
+	@./scripts/publish-version-tag $(GITHUB_CREDENTIALS)
+endif
+
+install-dev:
+	@pip install -e .
+
+clean:
+	@find . -type f -name '*.pyc' -delete
+	@find . -name __pycache__ -delete
+	@rm -rf dist *.egg-info
+
+check-version:
+	@./scripts/check-version $(VERSION)
+
+bump-version: check-version
+	@echo "__version__ = '$(VERSION)'" > ./goodatlas/konlpy/version.py
+
+.PHONY: \
+	publish \
+	publish-version-tag \
+	install-dev \
+	clean \
+	check-version \
+	bump-version
