@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+function usage() {
+    >&2 cat << EOM
+Create a git tag version using github API
+
+Usage:
+
+    $0 <username:password>
+
+Options:
+
+    username  Github username
+    password  Github password
+
+EOM
+    exit 1
+}
+
+
+[ -n "$1" ] || usage
+CREDENTIALS="$1"
+COMMIT_SHA=$(git rev-parse HEAD)
+TAG=v$(awk -F "'" '/^__version__/{ print $2 }' $(dirname "${BASH_SOURCE[0]}")/../goodatlas/konlpy/version.py)
+API_URL="https://api.github.com/repos/goodatlas/konlpy"
+
+tmp_file=$(mktemp)
+http_code=$(curl \
+    -u $CREDENTIALS \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d "{ \"ref\": \"refs/tags/$TAG\", \"sha\": \"$COMMIT_SHA\" }" \
+    -w "%{http_code}" \
+    -s \
+    -o $tmp_file \
+    $API_URL/git/refs)
+
+if [[ "$http_code" == "201" ]]; then
+    echo "Created git tag: $TAG"
+    cat $tmp_file
+    exit_code=0
+else
+    >&2 echo "Could not create git tag: $TAG"
+    >&2 cat $tmp_file
+    exit_code=2
+fi
+
+
+rm -f $tmp_file
+exit $exit_code

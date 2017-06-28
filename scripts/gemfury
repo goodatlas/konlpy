@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+function usage() {
+    >&2 cat << EOM
+Publish prebuilt package to gemfury
+
+Usage:
+
+    $0 <package> [<gemfury-pypi>]
+
+Options:
+
+    package      path to prebuilt python package
+    gemfury-pypi  gemfury secret url. Defaults to GEMFURY_PYPI env variable
+
+EOM
+    exit 1
+}
+
+
+PACKAGE="$1"
+GEMFURY_PYPI="${2:-$GEMFURY_PYPI}"
+[ -n "$PACKAGE" ] && [ -n "$GEMFURY_PYPI" ] || usage
+
+package_file="./dist/${PACKAGE}.tar.gz"
+tmp_file=$(mktemp)
+http_code=$(curl -s -w "%{http_code}" -o $tmp_file -F package=@$package_file $GEMFURY_PYPI)
+
+if [ "$http_code" != "200" ]; then
+    >&2 cat $tmp_file
+    >&2 echo "Could not upload package: $PACKAGE"
+    exit_code=2
+else
+    cat $tmp_file
+    echo "Package uploaded: $PACKAGE"
+    exit_code=0
+fi
+
+if [ "$exit_code" == 0 ] && [ -n "$SLACK_WEBHOOK_URL" ]; then
+    message="*$PACKAGE* is now available on gemfury"
+    curl -X POST \
+        --data-urlencode "payload={\"text\":\"${message}\"}" \
+        $SLACK_WEBHOOK_URL
+fi
+
+rm -f $tmp_file
+exit $exit_code
