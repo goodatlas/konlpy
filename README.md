@@ -5,7 +5,11 @@ Python Package for korean
 Available at gemfury
 
 ## Installation
-// After Add fury information (see 1password)
 ```bash
 (venv3) $ pip install goodatlas-konlpy
+```
+
+## Usage
+```python
+from goodatlas.konlpy.tag import Twitter, Mecab
 ```
