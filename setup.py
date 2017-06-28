@@ -58,7 +58,12 @@ KoNLPy is not just to create another, but to unify and build upon their shoulder
       ],
       license='GPL v3+',
       packages=find_packages(),
-      package_data={'konlpy': [
+      package_dir={
+          'goodatlas': 'goodatlas',
+          'goodatlas.konlpy': 'goodatlas/konlpy',
+          'goodatlas.konlpy.tag': 'goodatlas/konlpy/tag'
+      },
+      package_data={'goodatlas.konlpy': [
           'data/corpus/*/*.txt',
           'data/tagset/*.json',
           'java/conf/plugin/*/*/*.json',
