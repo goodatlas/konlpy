@@ -49,15 +49,20 @@ class Komoran():
     :param dicpath: The path of dictionary files. The KOMORAN system dictionary is loaded by default.
     """
 
-    def pos(self, phrase, flatten=True):
+    def pos(self, phrase, flatten=True, space=True):
         """POS tagger.
 
-        :param flatten: If False, preserves eojeols."""
+        :param flatten: If False, preserves eojeols.
+        :param space: If True, return tokens with space character
+        """
 
         if sys.version_info[0] < 3:
             result = self.jki.analyzeMorphs(phrase, self.dicpath)
         else:
             result = self.jki.analyzeMorphs3(phrase, self.dicpath).toString()
+
+        if space is True:
+            return utils.spacing(sentence=phrase, pos_result=parse(result, flatten))
 
         return parse(result, flatten)
 

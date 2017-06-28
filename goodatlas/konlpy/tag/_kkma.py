@@ -8,7 +8,6 @@ import jpype
 from .. import jvm
 from .. import utils
 
-
 __all__ = ['Kkma']
 
 
@@ -46,7 +45,7 @@ class Kkma():
         if not nouns: return []
         return [nouns.get(i).getString() for i in range(nouns.size())]
 
-    def pos(self, phrase, flatten=True):
+    def pos(self, phrase, flatten=True, space=False):
         """POS tagger.
 
         :param flatten: If False, preserves eojeols."""
@@ -66,7 +65,10 @@ class Kkma():
                         morphemes.append((morpheme.getString(), morpheme.getTag()))
                 else:
                     morphemes.append([(eojeol.get(k).getString(), eojeol.get(k).getTag())
-                                     for k in range(eojeol.size())])
+                                      for k in range(eojeol.size())])
+
+        if space is True:
+            return utils.spacing(sentence=phrase, pos_result=morphemes)
 
         return morphemes
 
