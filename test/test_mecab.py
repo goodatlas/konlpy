@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def mecab_instance():
-    from konlpy.tag import Mecab
+    from goodatlas.konlpy.tag import Mecab
     m = Mecab()
     return m
 

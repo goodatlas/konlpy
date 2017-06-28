@@ -3,7 +3,7 @@
 
 
 def test_corpus_kolaw():
-    from konlpy.corpus import kolaw
+    from goodatlas.konlpy.corpus import kolaw
 
     fids = kolaw.fileids()
 

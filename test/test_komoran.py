@@ -13,7 +13,7 @@ if sys.version_info[0] < 3:
 else:
     @pytest.fixture
     def komoran_instance():
-        from konlpy.tag import Komoran
+        from goodatlas.konlpy.tag import Komoran
         k = Komoran()
         return k
 
