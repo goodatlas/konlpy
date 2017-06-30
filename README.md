@@ -1,5 +1,5 @@
 # This repository has been deprecated
-It's moved to [`core`](goodatlas/core)
+### It's moved to [`core`](goodatlas/core)
 
 # ~~goodatlas-konlpy~~
 ~~Forked from konlpy/konlpy~~
