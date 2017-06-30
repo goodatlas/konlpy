@@ -1,4 +1,7 @@
-# goodatlas-konlpy
+# This repository has been deprecated
+It's moved to [`core`](goodatlas/core)
+
+# ~~goodatlas-konlpy~~
 Forked from konlpy/konlpy
 
 Python Package for korean
