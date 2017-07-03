@@ -1,15 +1,18 @@
-# goodatlas-konlpy
-Forked from konlpy/konlpy
+# This repository has been deprecated
+### It's moved to [`core`](goodatlas/core#87)
 
-Python Package for korean
-Available at gemfury
+# ~~goodatlas-konlpy~~
+~~Forked from konlpy/konlpy~~
 
-## Installation
+~~Python Package for korean~~
+~~Available at gemfury~~
+
+## ~~Installation~~
 ```bash
 (venv3) $ pip install goodatlas-konlpy
 ```
 
-## Usage
+## ~~Usage~~
 ```python
 from goodatlas.konlpy.tag import Twitter, Mecab
 ```
